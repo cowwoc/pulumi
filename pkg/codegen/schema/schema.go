@@ -187,6 +187,17 @@ func (t *ObjectType) String() string {
 
 func (*ObjectType) isType() {}
 
+type ResourceType struct {
+}
+
+func (t *ResourceType) String() string {
+	panic("implement me")
+}
+
+func (t *ResourceType) isType() {
+	panic("implement me")
+}
+
 // TokenType represents an opaque type that is referred to only by its token. A TokenType may have an underlying type
 // that can be used in place of the token.
 type TokenType struct {
@@ -568,6 +579,7 @@ type TypeSpec struct {
 	// Ref is a reference to a type in this or another document. For example, the built-in Archive, Asset, and Any
 	// types are referenced as "pulumi.json#/Archive", "pulumi.json#/Asset", and "pulumi.json#/Any", respectively.
 	// A type from this document is referenced as "#/types/pulumi:type:token".
+	// An external resource is referenced as "#/resources/pulumi:type:token".
 	Ref string `json:"$ref,omitempty"`
 	// AdditionalProperties, if set, describes the element type of an "object" (i.e. a string -> value map).
 	AdditionalProperties *TypeSpec `json:"additionalProperties,omitempty"`
@@ -863,14 +875,22 @@ func (t *types) bindType(spec TypeSpec) (Type, error) {
 		}
 
 		// Parse the ref and look up the type in the type map.
-		if !strings.HasPrefix(spec.Ref, "#/types/") {
+		var token string
+		var err error
+		if strings.HasPrefix(spec.Ref, "#/types/") {
+			token, err = url.PathUnescape(spec.Ref[len("#/types/"):])
+			if err != nil {
+				return nil, errors.Errorf("failed to parse ref %s", spec.Ref)
+			}
+		} else if strings.HasPrefix(spec.Ref, "#/resources/") {
+			token, err = url.PathUnescape(spec.Ref[len("#/resources/"):])
+			if err != nil {
+				return nil, errors.Errorf("failed to parse ref %s", spec.Ref)
+			}
+		} else {
 			return nil, errors.Errorf("failed to parse ref %s", spec.Ref)
 		}
 
-		token, err := url.PathUnescape(spec.Ref[len("#/types/"):])
-		if err != nil {
-			return nil, errors.Errorf("failed to parse ref %s", spec.Ref)
-		}
 		if typ, ok := t.objects[token]; ok {
 			return typ, nil
 		}
@@ -958,6 +978,7 @@ func (t *types) bindType(spec TypeSpec) (Type, error) {
 			t.maps[elementType] = typ
 		}
 		return typ, nil
+	// TODO: add "resource" case?
 	default:
 		return nil, errors.Errorf("unknown type kind %v", spec.Type)
 	}
