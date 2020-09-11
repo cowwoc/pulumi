@@ -23,7 +23,7 @@ jobs:
         run: |
           git fetch --quiet --prune --unshallow --tags
       - name: Install pulumictl
-        uses: jaxxstorm/action-install-gh-release@7b7442dc8b1ae094a286ea3eefda88e93ebba192
+        uses: jaxxstorm/action-install-gh-release@6277ebec57d2f9283d245d365f0b05bcc23d85e0
         with:
           repo: pulumi/pulumictl
       - name: Run GoReleaser
