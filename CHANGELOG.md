@@ -2,7 +2,11 @@ CHANGELOG
 =========
 
 ## HEAD (Unreleased)
-_(none)_
+
+- feat(autoapi): Add support for working with private Git repos. Either `SSHPrivateKeyPath`,
+  `PersonalAccessToken` or `UserName` and `Password` can be pushed to the `auto.GitRepo` struct
+  when interacting with a private repo
+  [#5333](https://github.com/pulumi/pulumi/pull/5333)
 
 ## 2.10.0 (2020-09-10)
 
