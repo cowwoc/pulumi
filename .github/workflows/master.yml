@@ -22,6 +22,10 @@ jobs:
       - name: Fetch Tags
         run: |
           git fetch --quiet --prune --unshallow --tags
+      - name: Install pulumictl
+        uses: jaxxstorm/action-install-gh-release@v2.0.0
+        with:
+          repo: pulumi/pulumictl
       - name: Run GoReleaser
         uses: goreleaser/goreleaser-action@v2
         with:
