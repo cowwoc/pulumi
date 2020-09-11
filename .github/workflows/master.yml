@@ -31,6 +31,8 @@ jobs:
         with:
           version: latest
           args: release --rm-dist --snapshot
+        env:
+          GORELEASER_CURRENT_TAG: 2.10.0
   lint:
     container: golangci/golangci-lint:latest
     name: Lint ${{ matrix.directory }}
