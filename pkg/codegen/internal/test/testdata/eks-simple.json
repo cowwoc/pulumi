@@ -1,0 +1,44 @@
+{
+  "resources": {
+    "eks:index:Cluster": {
+      "isComponent": true,
+      "inputProperties": {
+        "vpcId": {
+          "type": "string"
+        }
+      },
+      "properties": {
+        "kubeconfig": {
+          "$ref": "pulumi.json#/Any"
+        }
+      },
+      "methods": {
+        "getKubeconfig": "eks:index:Cluster/getKubeconfig"
+      }
+    }
+  },
+  "functions": {
+    "eks:index:Cluster/getKubeconfig": {
+      "inputs": {
+        "properties": {
+          "__self__": {
+            "$ref": "#/resources/eks:index:Cluster"
+          },
+          "roleArn": {
+            "type": "string"
+          },
+          "profileName": {
+            "type": "string"
+          }
+        }
+      },
+      "outputs": {
+        "properties": {
+          "kubeconfig": {
+            "type": "string"
+          }
+        }
+      }
+    }
+  }
+}
