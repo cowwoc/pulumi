@@ -188,15 +188,17 @@ func (t *ObjectType) String() string {
 func (*ObjectType) isType() {}
 
 type ResourceType struct {
+	// Token is the type's Pulumi type token.
+	Token string
+
+	// TODO: Might want to include a ref to the actual resource as well.
 }
 
 func (t *ResourceType) String() string {
-	panic("implement me")
+	return t.Token
 }
 
-func (t *ResourceType) isType() {
-	panic("implement me")
-}
+func (t *ResourceType) isType() {}
 
 // TokenType represents an opaque type that is referred to only by its token. A TokenType may have an underlying type
 // that can be used in place of the token.
@@ -877,17 +879,15 @@ func (t *types) bindType(spec TypeSpec) (Type, error) {
 		// Parse the ref and look up the type in the type map.
 		var token string
 		var err error
-		if strings.HasPrefix(spec.Ref, "#/types/") {
+		switch {
+		case strings.HasPrefix(spec.Ref, "#/types/"):
 			token, err = url.PathUnescape(spec.Ref[len("#/types/"):])
-			if err != nil {
-				return nil, errors.Errorf("failed to parse ref %s", spec.Ref)
-			}
-		} else if strings.HasPrefix(spec.Ref, "#/resources/") {
+		case strings.HasPrefix(spec.Ref, "#/resources/"):
 			token, err = url.PathUnescape(spec.Ref[len("#/resources/"):])
-			if err != nil {
-				return nil, errors.Errorf("failed to parse ref %s", spec.Ref)
-			}
-		} else {
+		default:
+			err = fmt.Errorf("unknown ref")
+		}
+		if err != nil {
 			return nil, errors.Errorf("failed to parse ref %s", spec.Ref)
 		}
 
