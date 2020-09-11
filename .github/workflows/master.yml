@@ -9,6 +9,24 @@ env:
   GO111MODULE: "on"
 
 jobs:
+  publish-binaries:
+    name: Publish
+    runs-on: macos-latest
+    steps:
+      - name: Set up Go ${{ matrix.go-version }}
+        uses: actions/setup-go@v1
+        with:
+          go-version: ${{ matrix.go-version }}
+      - name: Checkout Repo
+        uses: actions/checkout@v2
+      - name: Fetch Tags
+        run: |
+          git fetch --quiet --prune --unshallow --tags
+      - name: Run GoReleaser
+        uses: goreleaser/goreleaser-action@v2
+        with:
+          version: latest
+          args: release --rm-dist --snapshot
   lint:
     container: golangci/golangci-lint:latest
     name: Lint ${{ matrix.directory }}
@@ -93,13 +111,6 @@ jobs:
       - name: Publish Binaries
         run: |
           make publish_tgz
-        env:
-          PULUMI_NODE_MODULES: ${{ runner.temp }}/opt/pulumi/node_modules
-          PULUMI_LOCAL_NUGET: ${{ runner.temp }}/opt/pulumi/nuget
-          PULUMI_ROOT: ${{ runner.temp }}/opt/pulumi
-      - name: Publish SDK
-        run: |
-          make publish_packages
         env:
           PULUMI_NODE_MODULES: ${{ runner.temp }}/opt/pulumi/node_modules
           PULUMI_LOCAL_NUGET: ${{ runner.temp }}/opt/pulumi/nuget
